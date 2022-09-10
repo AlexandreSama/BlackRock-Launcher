@@ -1,0 +1,5 @@
+/node_modules
+/electron-builder.yml
+/dist
+/src/config.json
+/tes.js

@@ -1,0 +1,39 @@
+{
+  "name": "blackrock-launcher",
+  "version": "0.0.1-r1",
+  "description": "A Launcher for The Server Académie Rochenoir",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder build --win --publish never",
+    "deploy": "electron-builder build --win --publish always"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlexandreSama/BlackRock-Launcher.git"
+  },
+  "author": "Alexandre",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AlexandreSama/BlackRock-Launcher/issues"
+  },
+  "homepage": "https://github.com/AlexandreSama/BlackRock-Launcher#readme",
+  "dependencies": {
+    "@electron/remote": "^2.0.8",
+    "adm-zip": "^0.5.9",
+    "discord-rpc": "^4.0.1",
+    "electron-prompt": "^1.7.0",
+    "electron-updater": "^5.2.1",
+    "jquery": "^3.6.1",
+    "minecraft-launcher-core": "^3.16.16",
+    "moment": "^2.29.4",
+    "msmc": "^3.1.3",
+    "mysql2": "^2.3.3",
+    "nodejs-file-downloader": "^4.10.2",
+    "utf8": "^3.0.0"
+  },
+  "devDependencies": {
+    "electron": "^20.1.3",
+    "electron-builder": "^23.3.3"
+  }
+}
