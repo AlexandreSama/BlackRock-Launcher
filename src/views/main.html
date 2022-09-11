@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+		
+    <link rel="stylesheet" href="../components/assets/css/style.css">
+    <title>Jouer</title>
+</head>
+
+<body>
+    <div class="wrapper d-flex align-items-stretch">
+        <nav id="sidebar">
+            <div class="custom-menu">
+                <button type="button" id="sidebarCollapse" class="btn btn-primary">
+                </button>
+            </div>
+            <div class="img bg-wrap text-center py-4" style="background-image: url(../components/assets/images/bg_1.jpg);">
+                <div class="user-logo" id="userInfos">
+                    <div class="img" id="userLogo"></div>
+                    <h3 id="userPseudo"></h3>
+                </div>
+            </div>
+            <ul class="list-unstyled components mb-5" id="listSide">
+                <li class="active">
+                    <a href="#"><span class="fa fa-home mr-3"></span> Accueil</a>
+                </li>
+                <li>
+                    <a href="#" id="GoToSettings"><span class="fa fa-hammer mr-3"></span> Paramètres</a>
+                </li>
+            </ul>
+
+        </nav>
+
+        <!-- Page Content  -->
+        <div id="content" class="p-4 p-md-5 pt-5">
+            <video id="background-video" autoplay loop>
+                <source src="http://193.168.146.71/phenixmg/asset/Backgroundlauncher.mp4" type="video/mp4">
+            </video>
+            <h2 class="mb-4">Phenix MG</h2>
+
+            <button id="playMC">Jouer</button>
+            <div class="progress_bar">
+                <div class="progress-value"></div>
+            </div>
+            <p id="progressDownload" style="position: absolute; left: 890px; bottom: 91px; color: black; font-size: large;"></p>
+        </div>
+    </div>
+</body>
+<script src="https://kit.fontawesome.com/eec634434d.js" crossorigin="anonymous"></script>
+<script>window.$ = window.jQuery = require('jquery');</script>
+<script src="../components/assets/utilities/jquery.min.js"></script>
+<script src="../components/assets/utilities/popper.js"></script>
+<script src="../components/assets/utilities/bootstrap.min.js"></script>
+<script src="../components/assets/js/main.js"></script>
+
+<script>
+    document.getElementById('background-video').volume = 0.2
+    let MSResult
+    let MSResultRam
+    const progressbar = document.querySelector(".progress-value");
+
+    const changeProgress = (progress) => {
+        progressbar.style.width = `${progress}%`;
+    };
+
+
+    const ipc = require("electron").ipcRenderer;
+
+    document.getElementById('GoToSettings').addEventListener('click', () => {
+        if(!MSResult){
+            ipc.send('GoToSettings', MSResultRam[0]) 
+        }else{
+            ipc.send('GoToSettings', MSResult) 
+        }
+    })
+
+    document.getElementById("playMC").addEventListener("click", () => {
+        ipc.send("playMC");
+    });
+
+    ipc.on('dataDownload', (event, data) => {
+        document.getElementById('progressDownload').innerHTML =
+            `Téléchargement des ${data.type} : ${data.task} / ${data.total}`
+        console.log(data.type)
+
+        if (data.type === "assets") {
+            let percent = (data.task / data.total) * 100
+            changeProgress(percent)
+        } else if (data.type === "natives") {
+            let percent = (data.task / data.total) * 100
+            changeProgress(percent)
+        } else if (data.type === "classes-maven-custom") {
+            let percent = (data.task / data.total) * 100
+            changeProgress(percent)
+        } else if (data.type === "classes-custom") {
+            let percent = (data.task / data.total) * 100
+            changeProgress(percent)
+        } else if (data.type === "classes") {
+            let percent = (data.task / data.total) * 100
+            changeProgress(percent)
+        }
+    })
+
+    let i = 0
+    ipc.on('MissedModsDownload', (event, data) => {
+        i++
+        document.getElementById('progressDownload').innerHTML =
+            `Téléchargement de ${i} mods sur ${data.numberMods}`
+        let percent = (i / data.numberMods) * 100
+        changeProgress(percent)
+    })
+
+    ipc.on('forgeAlreadyDownload', (event, data) => {
+        document.getElementById('progressDownload').innerHTML = "Forge déjà téléchargé"
+    })
+
+    ipc.on('forgeDownloaded', (event, data) => {
+        document.getElementById('progressDownload').innerHTML = data
+    })
+
+    ipc.on('javaAlreadyDownloaded', (event, data) => {
+        document.getElementById('progressDownload').innerHTML = "Java déjà téléchargé"
+    })
+
+    ipc.on('javaDownloaded', (event, data) => {
+        document.getElementById('progressDownload').innerHTML = data
+    })
+
+    ipc.on('loginSuccessWithoutRam', (event, data) => {
+        console.log(data)
+        MSResult = data
+        
+        document.getElementById('userLogo').setAttribute('style', `background-image: url('https://crafatar.com/avatars/${data.id}');`)
+        document.getElementById('userPseudo').innerHTML += data.name
+    })
+
+    ipc.on('loginSuccessWithRam', (event, data) => {
+        console.log(data)
+        MSResultRam = data
+        
+        document.getElementById('userLogo').setAttribute('style', `background-image: url('https://crafatar.com/avatars/${data[0].id}');`)
+        document.getElementById('userPseudo').innerHTML += data[0].name
+
+        document.getElementById('ramValue').value = data[1].replace('G', '')
+    })
+
+    ipc.on('UserDataFromSettings', (event, data) => {
+        MSResult = data
+        document.getElementById('userLogo').setAttribute('style', `background-image: url('https://crafatar.com/avatars/${data.id}');`)
+        document.getElementById('userPseudo').innerHTML += data.name
+    }) 
+
+    ipc.on('LaunchingGame', (event, data) => {
+        document.getElementById('background-video').pause()
+    })
+    ipc.on('stoppingGame', (event, data) => {
+        document.getElementById('background-video').play()
+    })
+</script>
+
+</html>

@@ -1,11 +1,9 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <title>Connexion Minecraft</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -14,90 +12,42 @@
     <link rel="stylesheet" href="../components/assets/css/login.css">
 
     <script src="../components/assets/utilities/popper.js"></script>
+    <title>Login</title>
 </head>
-
-<body class="img js-fullheight" style="background-image: url(../components/assets/images/WallpaperBackgroundMain.jpg);">
-    <section class="ftco-section">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-6 text-center mb-5">
-                    <h2 class="heading-section">Karasia</h2>
+<body>
+    <body class="img js-fullheight" style="background-image: url(../components/assets/images/WallpaperBackgroundMain.jpg);">
+        <section class="ftco-section">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-md-6 text-center mb-5">
+                        <h2 class="heading-section">PhenixMG</h2>
+                    </div>
                 </div>
-            </div>
-            <div class="row justify-content-center">
-                <div class="col-md-6 col-lg-4">
-                    <div class="login-wrap p-0">
-                        <h3 class="mb-4 text-center">Déjà un compte ?</h3>
-                        <form action="#" class="signin-form">
-                            <p class="w-100 text-center">&mdash; se connecter avec &mdash;</p>
-                            <div class="social d-flex text-center">
-                                <a href="#" class="px-2 py-2 mr-md-1 rounded" id="MicrosoftLogin"><span
-                                        class="ion-logo-facebook mr-2"></span>
-                                    Microsoft</a>
-                            </div>
-                        </form>
+                <div class="row justify-content-center">
+                    <div class="col-md-6 col-lg-4">
+                        <div class="login-wrap p-0">
+                            <h3 class="mb-4 text-center">Déjà un compte ?</h3>
+                            <form action="#" class="signin-form">
+                                <p class="w-100 text-center">&mdash; se connecter avec &mdash;</p>
+                                <div class="social d-flex text-center">
+                                    <a href="#" class="px-2 py-2 mr-md-1 rounded" id="MicrosoftLogin"><span
+                                            class="ion-logo-facebook mr-2"></span>
+                                        Microsoft</a>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div id="notification" class="hidden">
-            <p id="message"></p>
-            <button id="close-button" onclick="closeNotification()">Fermer</button>
-            <button id="restart-button" onclick="restartApp()" class="hidden"> Restart</button>
-        </div>
-    </section>
-
-    <script>
-        const ipc = require('electron').ipcRenderer;
-        const fs = require('fs')
-        const remote = require('@electron/remote')
-        document.title = `Login | ${remote.app.getVersion()}`
-
-
-        const notification = document.getElementById('notification')
-        const message = document.getElementById('message')
-        const restartButton = document.getElementById('restart-button')
-
-        function closeNotification() {
-            notification.classList.add('hidden')
-        }
-
-        function restartApp() {
-            ipc.send('restart_app')
-        }
-
-        ipc.on('update_available', () => {
-            ipc.removeAllListeners('update_available')
-            message.innerText = 'Une mise a jour du launcher est disponible, je la télécharge pour vous...'
-            notification.classList.remove('hidden')
-        })
-
-        ipc.on('update_downloaded', () => {
-            ipc.removeAllListeners('update_downloaded')
-            message.innerText =
-                'Mise a jour téléchargé avec succés, elle sera installé après un redémarrage. Redémarrer maintenant ?'
-            restartButton.classList.remove('hidden')
-            notification.classList.remove('hidden')
-        })
-
-
-        ipc.on('savedID', (event, data) => {
-            console.log(data)
-            document.getElementById('emailField').value = data['student']['infos'][0].email
-        })
-
-        document.getElementById('MicrosoftLogin').addEventListener('click', () => {
-            ipc.send('loginMS')
-        })
-
-        ipc.on('Error-Login', (event) => {
-            remote.dialog.showErrorBox('Erreur !', 'Veuillez vérifier votre mot de passe ou votre email !')
-        })
-    </script>
-    <script>
-        window.$ = window.jQuery = require('jquery');
-    </script>
-    <script src="../components/assets/js/login.js"> </script>
+        </section>
 </body>
 
+<script>window.$ = window.jQuery = require('jquery');</script>
+<script src="../components/assets/js/login.js"> </script>
+<script>
+    const ipc = require('electron').ipcRenderer;
+    document.getElementById('MicrosoftLogin').addEventListener('click', () => {
+        ipc.send('loginMS')
+    })
+</script>
 </html>

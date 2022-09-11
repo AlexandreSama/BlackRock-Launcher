@@ -10,24 +10,29 @@ const {
 } = require('electron-updater');
 const request = require('request');
 const msmc = require("msmc");
-const fetch = require('node-fetch');
-const mysql = require('mysql2')
-const ConfigVps = require('./config.json')
-const remoteMain = require('@electron/remote/main')
 const rpc = require("discord-rpc");
 const client = new rpc.Client({
   transport: 'ipc'
 });
+const log = require('electron-log');
+const notifier = require('node-notifier');
+const process = require('process');
+const { shell } = require('electron');
+const { launchMC, writeRamToFile, checkLauncherPaths } = require('./components/functions/functions');
 
-let launcherPath = app.getPath('appData') + '\\BlackRockLauncher\\'
-let launcherModsPath = app.getPath('appData') + '\\BlackRockLauncher\\mods\\'
-let launcherJavaPath = app.getPath('appData') + '\\BlackRockLauncher\\Java\\'
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = "info"
+autoUpdater.logger.transports.file.resolvePath = () => path.join(app.getPath('appData'), 'BlackrockLauncher/logs/main.log')
+
+log.info('App starting...');
 
 client.login({
   clientId: '653960332489785384'
-}).catch(console.error);
+}).catch((reason) => {
+  log.error('[Discord-RPC] Error : ' + reason)
+});
 client.on('ready', () => {
-  console.log('Your presence works now check your discord profile :D')
+  log.info('Your presence works now check your discord profile :D')
   client.request('SET_ACTIVITY', {
     pid: process.pid,
     activity: {
@@ -51,16 +56,24 @@ client.on('ready', () => {
     }
   })
 })
-
-remoteMain.initialize()
 //All Called Functions
 
-const functionsPages = require('./components/functions/ChangePages')
-const Minecraft = require('./components/functions/Functions')
-const process = require('process');
+let paths = [
+  app.getPath('appData') + '\\BlackrockLauncher\\', 
+  app.getPath('appData') + '\\BlackrockLauncher\\mods\\', 
+  app.getPath('appData') + '\\BlackrockLauncher\\java\\'
+]
+let responseUpdate
 let MSResult
-
 let mainWindow
+
+/**
+ * It takes a string as an argument and logs it to the console.
+ * @param text - The text to be displayed in the status bar.
+ */
+ function sendStatusToWindow(text) {
+  log.info(text);
+}
 
 function createWindow() {
 
@@ -77,34 +90,22 @@ function createWindow() {
   }); // on définit une taille pour notre fenêtre
 
   mainWindow.loadURL(`file://${__dirname}/views/login.html`); // on doit charger un chemin absolu
-  remoteMain.enable(mainWindow.webContents)
 
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
 
-  //Quand la page est prête a être chargé
-  mainWindow.once('ready-to-show', () => {
-    autoUpdater.checkForUpdatesAndNotify()
-    let options = {
-      url: "https://api.github.com/repos/AlexandreSama/Portal/releases",
-      headers: {
-        'user-agent': 'node.js',
-        'Content-Type': 'application/json'
-      }
-    }
-    request(options, function (error, response, body) {
-      if (error) {
-        console.log(error)
-      }
-      mainWindow.webContents.send('githubReleaseData', JSON.parse(body))
-    })
-    let appIcon = __dirname + '/logo.ico'
-    let tray = new Tray(appIcon)
+  const tray = new Tray(__dirname + '/logo.ico')
+  tray.setToolTip('Launcher PhenixMG')
+  tray.on('click', () => {
+      mainWindow.show()
   })
 }
 
-app.on('ready', createWindow);
+app.on('ready', function() {
+  createWindow()
+  autoUpdater.checkForUpdatesAndNotify()
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -118,20 +119,6 @@ app.on('activate', () => {
   }
 });
 
-// fs.readdir(data, 'utf8', (err, files) => {
-//   var tbodyRef = document.getElementById('ModTable').getElementsByTagName('tbody')[0]
-//   files.forEach(element => {
-//       var newRow = tbodyRef.insertRow();
-
-//       // Insert a cell at the end of the row
-//       var newCell = newRow.insertCell();
-
-//       // Append a text node to the cell
-//       var newText = document.createTextNode(element);
-//       newCell.appendChild(newText);
-//   })
-// })
-
 // Updates Parts
 
 ipcMain.on('app_version', (event) => {
@@ -140,79 +127,110 @@ ipcMain.on('app_version', (event) => {
   });
 });
 
+/* Listening for an update-not-available event and then sending a message to the window. */
+autoUpdater.on('checking-for-update', () => {
+  sendStatusToWindow('Checking for update...');
+})
+
+/* Listening for an update-not-available event and then sending a message to the window. */
+autoUpdater.on('update-not-available', (info) => {
+  sendStatusToWindow('Update not available.');
+})
+
+/* A listener for the autoUpdater. It listens for an error and then sends the error to the window. */
+autoUpdater.on('error', (err) => {
+  sendStatusToWindow('Error in auto-updater. ' + err);
+})
+
+/* Showing a notification to the user when an update is available. */
 autoUpdater.on('update-available', () => {
-  mainWindow.webContents.send('update_available')
+  sendStatusToWindow('Update available.');
+  notifier.notify({
+      title: 'Mise a jour est disponible !',
+      message: 'Une mise a jour est disponible ! Voulez-vous la télécharger et l\'installer ?',
+      actions: ['Oui', 'Non'],
+      wait: true
+  },
+  function (err, response, metadata) {
+      responseUpdate = response
+  })
 })
 
+/* Listening for an update-downloaded event and then sending a message to the window. */
 autoUpdater.on('update-downloaded', () => {
-  mainWindow.webContents.send('update_downloaded')
+  sendStatusToWindow('Update Téléchargé !')
+  sendStatusToWindow(responseUpdate)
+  if(responseUpdate == "oui"){
+      autoUpdater.quitAndInstall(true)
+  }
 })
 
-ipcMain.on('restart_app', () => {
-  autoUpdater.quitAndInstall()
+/* A function that is called when the user clicks on the login button. */
+ipcMain.on('loginMS', (event, data) => {
+  msmc.fastLaunch('raw', (update) => {
+
+  }).then(result => {
+      if (msmc.errorCheck(result)) {
+          console.log(result.reason)
+          return;
+      }
+      MSResult = result
+      console.log('testas')
+      console.log(paths[0] + 'infos.json') 
+      fs.readFile(paths[0] + 'infos.json', (err, data) => {
+          if(data == undefined){
+              mainWindow.loadURL(`file://${__dirname}/../src/views/main.html`)
+              mainWindow.webContents.once('dom-ready', () => {
+                  mainWindow.webContents.send('loginSuccessWithoutRam', (result.profile))
+              });
+          }else{
+              let datas = JSON.parse(data)
+              mainWindow.loadURL(`file://${__dirname}/../src/views/main.html`)
+              mainWindow.webContents.once('dom-ready', () => {
+                  mainWindow.webContents.send('loginSuccessWithRam', [result.profile, datas.ram])
+              })
+          }
+      })
+  })
+
+  checkLauncherPaths(paths[0], paths[2], paths[1], event)
 })
 
-//Pages Parts
-
-ipcMain.on('GoToMinecraft', (event, data) => {
-  functionsPages.GoToMinecraftLogin(mainWindow)
+/* Saving the ram to a file. */
+ipcMain.on('saveRam', (event, data) => {
+  let ram = data + "G"
+  writeRamToFile(ram, paths[0] + 'infos.json')
 })
 
-ipcMain.on('GoToMain', (event, data) => {
-  functionsPages.GoToMain(mainWindow)
-})
-
-ipcMain.on('GoToAccueilMC', (event, data) => {
-  functionsPages.GoToAccueilMC(mainWindow)
+/* Listening for the playMC event from the renderer process. */
+ipcMain.on('playMC', (event, data) => {
+  fs.readFile(paths[0] + 'infos.json', (err, data) => {
+      let ram = JSON.parse(data)
+      console.log(ram.ram)
+      launchMC(ram.ram, MSResult, paths[0], paths[1], paths[2], event, mainWindow)
+  })
 })
 
 ipcMain.on('GoToSettings', (event, data) => {
-  functionsPages.GoToSettings(mainWindow)
-})
-
-ipcMain.on('GoToSettingsMC', (event, data) => {
-  functionsPages.GoToSettingsMC(mainWindow)
-})
-
-ipcMain.on('SaveAppID', (event, data) => {
-  functionsPages.saveAppID(data, launcherPath)
-})
-
-// Minecraft Parts
-
-ipcMain.on('loginMS', (event, data) => {
-  msmc.fastLaunch("raw", (update) => {
-
-  }).then(result => {
-    if (msmc.errorCheck(result)) {
-      console.log(result.reason)
-      return;
-    }
-    result.profile
-    MSResult = result
-    mainWindow.loadURL(`file://${__dirname}/../src/views/accueil.html`)
-    let Data = fs.readFileSync(launcherPath + 'infos.json')
-    let DataJson = JSON.parse(Data)
-    let ram = DataJson.infos[0].ram
-    mainWindow.webContents.once('dom-ready', () => {
-      mainWindow.webContents.send('MSData', result.profile)
-      mainWindow.webContents.send('DataRam', ram)
-    })
+  mainWindow.loadURL(`file://${__dirname}/../src/views/param.html`)
+  mainWindow.webContents.once('dom-ready', () => {
+      mainWindow.webContents.send('UserDataFromMain', data)
   })
-  Minecraft.downloadModsList(launcherPath)
 })
 
-ipcMain.on('GoToModList', (event, data) => {
-  functionsPages.GoToMCModList(mainWindow, launcherModsPath)
+ipcMain.on('GoToMain', (event, data) => {
+  console.log(data)
+  mainWindow.loadURL(`file://${__dirname}/../src/views/main.html`)
+  mainWindow.webContents.once('dom-ready', () => {
+      mainWindow.webContents.send('UserDataFromSettings', data)
+  })
 })
 
-ipcMain.on('Play', (event, data) => {
-  Minecraft.launchGame(MSResult, launcherPath, launcherJavaPath, launcherModsPath, mainWindow, event)
-})
-ipcMain.on('saveID', (event, data) => {
-  Minecraft.saveID(launcherPath, data.email)
+ipcMain.on('openLogFile', (event, data) => {
+  let path = app.getPath('appData') + '\\BlackrockLauncher\\logs\\main.log'
+  shell.openPath(path)
 })
 
-ipcMain.on('SaveRam', (event, data) => {
-  Minecraft.saveRam(data, launcherPath)
+ipcMain.on('openLauncherFolder', (event, data) => {
+  shell.openPath(paths[0])
 })
