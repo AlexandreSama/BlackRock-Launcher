@@ -41,8 +41,40 @@
                 <source src="http://193.168.146.71/phenixmg/asset/Backgroundlauncher.mp4" type="video/mp4">
             </video>
             <h2 class="mb-4">Blackrock Launcher</h2>
-
-            <button id="playMC">Jouer</button>
+            <div class="row ">
+                <div class="col-xl-3 col-lg-6">
+                    <div style="width: 309px; height: 127px; background-color: transparent; border: solid black 2px;">
+                        <div class="card-statistic-3 p-4">
+                            <div class="mb-4">
+                                <h5 class="card-title mb-0">Ping du serveur :</h5>
+                            </div>
+                            <div class="row align-items-center mb-2 d-flex">
+                                <div class="col-8">
+                                    <h2 class="d-flex align-items-center mb-0" id="pingServer">
+                                        
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-6">
+                    <div style="width: 309px; height: 127px; background-color: transparent; border: solid black 2px;">
+                        <div class="card-statistic-3 p-4">
+                            <div class="mb-4">
+                                <h5 class="card-title mb-0">Nombre de joueurs :</h5>
+                            </div>
+                            <div class="row align-items-center mb-2 d-flex">
+                                <div class="col-8">
+                                    <h2 class="d-flex align-items-center mb-0" id="playerCount">
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button id="playMC" class="btn btn-success" style="height: 60px; bottom: 95px; left: 87%; position: absolute; width: 200px;">Jouer</button>
             <div class="progress_bar">
                 <div class="progress-value"></div>
             </div>
@@ -63,6 +95,7 @@
     let MSResultRam
     const progressbar = document.querySelector(".progress-value");
     const remote = require('@electron/remote')
+    const util = require('minecraft-server-util');
 
     document.title = `Accueil | Blackrock-Launcher V${remote.app.getVersion()}`
 
@@ -162,6 +195,14 @@
     })
     ipc.on('stoppingGame', (event, data) => {
         document.getElementById('background-video').play()
+    })
+
+    util.status('193.168.146.71', 25565).then((result) => {
+        let latency = result.roundTripLatency
+        let players = result['players'].online
+
+        document.getElementById('pingServer').innerHTML += latency + ' ms'
+        document.getElementById('playerCount').innerHTML += players
     })
 </script>
 

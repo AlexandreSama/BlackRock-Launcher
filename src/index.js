@@ -88,9 +88,9 @@ function createWindow() {
       enableRemoteModule: true,
     },
     frame: true,
-    icon: __dirname + '/logo.ico'
+    icon: __dirname + '/logo.ico',
   }); // on définit une taille pour notre fenêtre
-
+  mainWindow.removeMenu()
   mainWindow.loadURL(`file://${__dirname}/views/login.html`); // on doit charger un chemin absolu
   remoteMain.enable(mainWindow.webContents)
 
