@@ -8270,7 +8270,7 @@
       #sidebar.active .custom-menu {
         margin-right: -50px; }
       #sidebar.active .btn.btn-primary:before {
-        content: "\f053";
+        content: "\f054";
         font-family: "FontAwesome";
         right: 2px !important; }
       #sidebar.active .btn.btn-primary:after {
@@ -8359,7 +8359,7 @@
           font-family: "FontAwesome";
           color: #fff; }
         #sidebar .custom-menu .btn.btn-primary:after {
-          content: "\f054";
+          content: "\f053";
           left: 2px; }
   
   .bg-wrap {

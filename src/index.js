@@ -208,9 +208,13 @@ ipcMain.on('saveRam', (event, data) => {
 /* Listening for the playMC event from the renderer process. */
 ipcMain.on('playMC', (event, data) => {
   fs.readFile(paths[0] + 'infos.json', (err, data) => {
-      let ram = JSON.parse(data)
-      console.log(ram.ram)
-      launchMC(ram.ram, MSResult, paths[0], paths[1], paths[2], event, mainWindow)
+      if(err){
+        launchMC(0, MSResult, paths[0], paths[1], paths[2], event, mainWindow)
+      }else{
+        let ram = JSON.parse(data)
+        console.log(ram.ram)
+        launchMC(ram.ram, MSResult, paths[0], paths[1], paths[2], event, mainWindow)
+      }
   })
 })
 

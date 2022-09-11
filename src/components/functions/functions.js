@@ -176,7 +176,7 @@ async function checkMods(modsFolder, event) {
  */
 async function launchGame(result, rootFolder, javaFolder, ram, event, mainWindow) {
     let opts
-    if(ram){
+    if(ram != 0){
         opts = {
             clientPackage: null,
             authorization: getMCLC().getAuth(result),
