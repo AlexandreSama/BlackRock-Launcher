@@ -81,15 +81,16 @@
 </body>
 <script src="https://kit.fontawesome.com/eec634434d.js" crossorigin="anonymous"></script>
 <script>window.$ = window.jQuery = require('jquery');</script>
-<script src="../components/assets/js/jquery.min.js"></script>
-<script src="../components/assets/js/popper.js"></script>
-<script src="../components/assets/js/bootstrap.min.js"></script>
+<script src="../components/assets/utilities/jquery.min.js"></script>
+<script src="../components/assets/utilities/popper.js"></script>
+<script src="../components/assets/utilities/bootstrap.min.js"></script>
 <script src="../components/assets/js/main.js"></script>
 <script>
 
     const ipc = require("electron").ipcRenderer;
     let MSResult
     const remote = require('@electron/remote')
+    const fs = require('fs')
     document.title = `Paramètres | Blackrock-Launcher V${remote.app.getVersion()}`
     
     document.getElementById('GoToMain').addEventListener('click', () => {
@@ -111,6 +112,44 @@
     })
     document.getElementById('logsFile').addEventListener('click', () => {
         ipc.send('openLogFile')
+    })
+
+    fs.readFile(remote.app.getPath('appData') + '\\BlackrockLauncher\\infos.json', (err, data) => {
+        if(data != undefined){
+            let ram = JSON.parse(data)
+            console.log(ram.ram)
+            var select = document.getElementById('language')
+            var option
+
+            for (var i=0; i<select.options.length; i++) {
+                option = select.options[i];
+
+                if (option.value == ram.ram.replace('G', '')) {
+                // or
+                // if (option.text == 'Malaysia') {
+                    option.setAttribute('selected', true);
+
+                    // For a single select, the job's done
+                    return; 
+                } 
+            }
+        }else{
+            var select = document.getElementById('language')
+            var option
+
+            for (var i=0; i<select.options.length; i++) {
+                option = select.options[i];
+
+                if (option.value == '8') {
+                // or
+                // if (option.text == 'Malaysia') {
+                    option.setAttribute('selected', true);
+
+                    // For a single select, the job's done
+                    return; 
+                } 
+            }
+        }
     })
 </script>
 </html>
