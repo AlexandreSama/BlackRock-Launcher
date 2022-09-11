@@ -38,21 +38,21 @@ client.on('ready', () => {
   client.request('SET_ACTIVITY', {
     pid: process.pid,
     activity: {
-      details: "Voyage a travers les portails",
-      state: "Made with Discord-RPC",
+      details: "Fais joujou avec la science !",
+      state: "Crée avec les génies du RP",
       assets: {
-        large_image: "portal",
-        large_text: "Voyage a travers les portails",
-        small_image: "fusee",
-        small_text: "Enfile sa tenue de cosmonaute",
+        large_image: "blackrockrp",
+        large_text: "Créer par les mecs de chez Académie Rochenoir",
+        small_image: "minecraftblackrock",
+        small_text: "Perdu entre une action RP",
       },
       buttons: [{
           label: "Notre Discord",
-          url: "https://discord.gg/8mH6nw7H"
+          url: "https://discord.gg/9GgV4hmq"
         },
         {
           label: "Télécharge moi",
-          url: "https://github.com/AlexandreSama/Portal/releases/download/v1.0.0-r7/portal-Setup-1.0.0-r7.exe"
+          url: "https://github.com/AlexandreSama/BlackRock-Launcher/releases/download/v0.0.1-r3/blackrock-launcher-Setup-0.0.1-r3.exe"
         },
       ]
     }
