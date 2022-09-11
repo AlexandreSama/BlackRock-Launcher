@@ -19,12 +19,14 @@ const notifier = require('node-notifier');
 const process = require('process');
 const { shell } = require('electron');
 const { launchMC, writeRamToFile, checkLauncherPaths } = require('./components/functions/functions');
+const remoteMain = require('@electron/remote/main')
 
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = "info"
 autoUpdater.logger.transports.file.resolvePath = () => path.join(app.getPath('appData'), 'BlackrockLauncher/logs/main.log')
 
 log.info('App starting...');
+remoteMain.initialize()
 
 client.login({
   clientId: '653960332489785384'
@@ -90,13 +92,14 @@ function createWindow() {
   }); // on définit une taille pour notre fenêtre
 
   mainWindow.loadURL(`file://${__dirname}/views/login.html`); // on doit charger un chemin absolu
+  remoteMain.enable(mainWindow.webContents)
 
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
 
   const tray = new Tray(__dirname + '/logo.ico')
-  tray.setToolTip('Launcher PhenixMG')
+  tray.setToolTip('Blackrock Launcher')
   tray.on('click', () => {
       mainWindow.show()
   })

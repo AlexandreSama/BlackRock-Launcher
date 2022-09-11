@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="../components/assets/css/login.css">
 
     <script src="../components/assets/utilities/popper.js"></script>
-    <title>Login</title>
+    <title></title>
 </head>
 <body>
     <body class="img js-fullheight" style="background-image: url(../components/assets/images/WallpaperBackgroundMain.jpg);">
@@ -20,7 +20,7 @@
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-md-6 text-center mb-5">
-                        <h2 class="heading-section">PhenixMG</h2>
+                        <h2 class="heading-section">Blackrock Launcher</h2>
                     </div>
                 </div>
                 <div class="row justify-content-center">
@@ -46,8 +46,10 @@
 <script src="../components/assets/js/login.js"> </script>
 <script>
     const ipc = require('electron').ipcRenderer;
+    const remote = require('@electron/remote')
     document.getElementById('MicrosoftLogin').addEventListener('click', () => {
         ipc.send('loginMS')
     })
+    document.title = `Login | Blackrock Launcher V${remote.app.getVersion()}`
 </script>
 </html>

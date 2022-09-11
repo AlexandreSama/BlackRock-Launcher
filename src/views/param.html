@@ -89,6 +89,8 @@
 
     const ipc = require("electron").ipcRenderer;
     let MSResult
+    const remote = require('@electron/remote')
+    document.title = `Paramètres | Blackrock-Launcher V${remote.app.getVersion()}`
     
     document.getElementById('GoToMain').addEventListener('click', () => {
         ipc.send('GoToMain', MSResult)

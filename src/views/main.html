@@ -40,7 +40,7 @@
             <video id="background-video" autoplay loop>
                 <source src="http://193.168.146.71/phenixmg/asset/Backgroundlauncher.mp4" type="video/mp4">
             </video>
-            <h2 class="mb-4">Phenix MG</h2>
+            <h2 class="mb-4">Blackrock Launcher</h2>
 
             <button id="playMC">Jouer</button>
             <div class="progress_bar">
@@ -62,6 +62,9 @@
     let MSResult
     let MSResultRam
     const progressbar = document.querySelector(".progress-value");
+    const remote = require('@electron/remote')
+
+    document.title = `Accueil | Blackrock-Launcher V${remote.app.getVersion()}`
 
     const changeProgress = (progress) => {
         progressbar.style.width = `${progress}%`;
