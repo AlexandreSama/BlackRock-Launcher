@@ -1,6 +1,6 @@
 {
   "name": "blackrock-launcher",
-  "version": "0.0.1-r5",
+  "version": "0.0.1-r6",
   "description": "A Launcher for The Server Académie Rochenoir",
   "main": "src/index.js",
   "icon": "src/logo.ico",
