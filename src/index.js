@@ -164,7 +164,7 @@ autoUpdater.on('update-downloaded', () => {
   sendStatusToWindow('Update Téléchargé !')
   sendStatusToWindow(responseUpdate)
   if(responseUpdate == "oui"){
-      autoUpdater.quitAndInstall(true)
+      autoUpdater.quitAndInstall(true, true)
   }
 })
 
