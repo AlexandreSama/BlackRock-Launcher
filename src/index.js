@@ -39,20 +39,20 @@ client.on('ready', () => {
     pid: process.pid,
     activity: {
       details: "Fais joujou avec la science !",
-      state: "Crée avec les génies du RP",
+      state: "Crée avec les génies du RP et les boss chez Phenix MG!",
       assets: {
         large_image: "blackrockrp",
-        large_text: "Créer par les mecs de chez Académie Rochenoir",
+        large_text: "Créer par un groupe de psycho !",
         small_image: "minecraftblackrock",
         small_text: "Perdu entre une action RP",
       },
       buttons: [{
-          label: "Notre Discord",
+          label: "Discord Académie Rochenoir",
           url: "https://discord.gg/9GgV4hmq"
         },
         {
-          label: "Télécharge moi",
-          url: "https://github.com/AlexandreSama/BlackRock-Launcher/releases/download/v0.0.1-r3/blackrock-launcher-Setup-0.0.1-r3.exe"
+          label: "Discord Phenix MG",
+          url: "https://discord.gg/ARTGnG2SNU"
         },
       ]
     }
