@@ -96,7 +96,7 @@
     const progressbar = document.querySelector(".progress-value");
     const remote = require('@electron/remote')
     const util = require('minecraft-server-util');
-
+    let playButton = document.getElementById('playMC')
     document.title = `Accueil | Blackrock-Launcher V${remote.app.getVersion()}`
 
     const changeProgress = (progress) => {
@@ -116,6 +116,8 @@
 
     document.getElementById("playMC").addEventListener("click", () => {
         ipc.send("playMC");
+        playButton.disabled = true
+        document.getElementById('progressDownload').innerHTML = 'Préparation du lancement...'
     });
 
     ipc.on('dataDownload', (event, data) => {
@@ -195,6 +197,7 @@
     })
     ipc.on('stoppingGame', (event, data) => {
         document.getElementById('background-video').play()
+        playButton.disabled = false
     })
 
     util.status('193.168.146.71', 25565).then((result) => {
