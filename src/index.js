@@ -41,7 +41,7 @@ client.on('ready', () => {
       details: "Fais joujou avec la science !",
       state: "Crée avec les génies du RP et les boss chez Phenix MG!",
       assets: {
-        large_image: "blackrockrp",
+        large_image: "logo",
         large_text: "Créer par un groupe de psycho !",
         small_image: "minecraftblackrock",
         small_text: "Perdu entre une action RP",
@@ -152,7 +152,9 @@ autoUpdater.on('update-available', () => {
       title: 'Mise a jour est disponible !',
       message: 'Une mise a jour est disponible ! Voulez-vous la télécharger et l\'installer ?',
       actions: ['Oui', 'Non'],
-      wait: true
+      wait: true,
+      icon: './logo.ico',
+      sound: './update.mp3'
   },
   function (err, response, metadata) {
       responseUpdate = response
