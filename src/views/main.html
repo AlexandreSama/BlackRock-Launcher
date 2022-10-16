@@ -196,6 +196,7 @@
         document.getElementById('background-video').pause()
     })
     ipc.on('stoppingGame', (event, data) => {
+        document.getElementById('progressDownload').innerHTML = ''
         document.getElementById('background-video').play()
         playButton.disabled = false
     })

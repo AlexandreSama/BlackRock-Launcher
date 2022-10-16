@@ -135,34 +135,73 @@ async function checkMods(modsFolder, event) {
         })
 
         let difference = modsRemote.filter(x => !folderMods.includes(x));
+        // let differenceUpdate = folderMods.filter(y => !modsRemote.includes(y))
+        // console.log(difference)
+        // console.log(differenceUpdate)
 
         if (difference.length >= 1) {
-            log.info(`${difference.length} mods is missing ! Preparing to download them..`)
-
+            log.info(`${difference.length} mods is missing or updated !`)
             let leftMods = difference.length
             let numberMods = difference.length
-            for await (const element of difference) {
-                if(element != "memory_repo"){
-                    const downloadMissedMods = new Downloader({
-                        url: "http://193.168.146.71/phenixmg/asset/mods/" + element,
-                        directory: modsFolder,
-                        maxAttempts: 3
+            difference.forEach(async (element) => {
+                    checkModsUpdated(element, modFolder, folderMods, event).then(async response => {
+                        console.log(response)
+                        if(response[0] == 1){
+                            fs.rmSync(modsFolder + response[1])
+                            const downloadMissedMods = new Downloader({
+                                url: "http://193.168.146.71/phenixmg/asset/mods/" + element,
+                                directory: modsFolder,
+                                maxAttempts: 3
+                            })
+                            await downloadMissedMods.download()
+                            i++
+                            leftMods--
+                            log.info(`there are ${leftMods} mods left to download...`)
+                            event.sender.send('MissedModsDownload', {
+                                numberMods
+                            })
+                        }else{
+                            console.log('Mod a télécharger !')
+                            if(element != "memory_repo"){
+                                const downloadMissedMods = new Downloader({
+                                    url: "http://193.168.146.71/phenixmg/asset/mods/" + element,
+                                    directory: modsFolder,
+                                    maxAttempts: 3
+                                })
+                                await downloadMissedMods.download()
+                                i++
+                                leftMods--
+                                log.info(`there are ${leftMods} mods left to download...`)
+                                event.sender.send('MissedModsDownload', {
+                                    numberMods
+                                })
+                            }
+                        }
                     })
-                    await downloadMissedMods.download()
-                    i++
-                    leftMods--
-                    log.info(`there are ${leftMods} mods left to download...`)
-                    event.sender.send('MissedModsDownload', {
-                        numberMods
-                    })
-                }
-            };
-        }
-    })
+                })
+            }
+        })
 
     log.info('All mods are here !')
 
     return true
+}
+
+async function checkModsUpdated(modToCheck, modsFolder, folderMods, event) {
+    let modsWithoutNumbers = []
+    let modToCheckCutted = modToCheck.replace(/[0-9\-\.\jar]+/gm, '')
+    let response = []
+    let i = 0
+    folderMods.forEach(element => {
+        let cut = element.replace(/[0-9\-\.\jar]+/gm, '')
+        if(cut == modToCheckCutted && i == 0){
+            i++
+            response.push(1, element)
+        }
+        modsWithoutNumbers.push(cut)
+    })
+
+    return response
 }
 
 /**
